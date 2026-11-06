@@ -10,7 +10,8 @@ Publicación nativa de Pages desde la rama `gh-pages`. GitHub Actions queda como
 
 ## Alcance y privacidad
 
-- Resúmenes de consultas y futuras comparaciones entre **propuesta original y norma definitiva publicada**, resaltando diferencias.
+- Resúmenes de consultas y comparaciones entre **propuesta inicial, revisiones documentadas y norma definitiva publicada**, resaltando diferencias.
+- El caso de riesgo de mercado (julio de 2026) incorpora la evolución hasta la Circular CMF N.º 2.378. Solo se usan textos normativos y estimaciones públicas de los dos PDF recibidos; se omiten comentarios de participantes. Las fuentes se identifican por título, sección y página física impresa: no consignan URL oficial pública. No se publican los PDF ni se inventan enlaces o fechas de la segunda consulta.
 - Los comentarios privados del usuario son **confidenciales** y están completamente fuera del proyecto. No solicitarlos, almacenarlos ni exponerlos; tampoco como fixtures, adjuntos o commits.
 - La consulta CMF de octubre de 2026 se incorpora solo como resumen: según la actualización del usuario aún no existe norma definitiva publicada para este caso. No se crea comparación ficticia.
 - No hay fecha límite de comentarios identificada en el documento recibido. No inferir una.
@@ -23,6 +24,8 @@ site/index.html                         # historial; una tarjeta por consulta
 site/assets/styles.css                  # estilos responsive compartidos
 site/assets/search.js                   # búsqueda local por palabras, ignora tildes
 site/consultas/2026-10-cmf-depositantes/ # ficha histórica + resumen.html original
+site/consultas/2026-07-cmf-riesgo-mercado/ # ficha histórica + resumen de la nueva propuesta
+site/comparaciones/2026-07-cmf-riesgo-mercado.html # tres etapas hasta Circular 2.378
 site/plantillas/comparacion.html         # dos fuentes públicas + diferencias por materia
 site/comparaciones/                     # crear páginas solo cuando haya ambas versiones
 examples/pages-actions.yml             # ejemplo opcional; no es un workflow activo
@@ -40,7 +43,7 @@ NORMAS_BASE_URL=https://gcorreai.github.io/normas-en-consulta/ node --test tests
 python3 -m http.server 8000 --directory site
 ```
 
-Abrir `http://localhost:8000/`. El servidor se detiene con Ctrl+C. La prueba de navegador crea su propio servidor bajo `/normas/`, no usa la sesión del usuario y elimina su perfil temporal. Comprueba el filtro real, cero resultados, restablecimiento, ausencia de errores JS, cuatro páginas a 360/390/1280 px y los controles del resumen original. Ejecuta Chromium headless con `--no-sandbox` solo para estas páginas locales controladas. CI ejecuta las pruebas de contenido/rutas/búsqueda; la validación Chromium se ejecuta localmente.
+Abrir `http://localhost:8000/`. El servidor se detiene con Ctrl+C. La prueba de navegador crea su propio servidor bajo `/normas/`, no usa la sesión del usuario y elimina su perfil temporal. Comprueba el filtro real por título, organismo y temas de ambas consultas, cero resultados, restablecimiento y ausencia de errores JS. Recorre siete páginas a 360/390/1280 px (21 comprobaciones de layout), valida por HTTP sus enlaces, recursos y anclas a 390 px y conserva las pruebas de controles del resumen original. Ejecuta Chromium headless con `--no-sandbox` solo para estas páginas locales controladas. CI ejecuta las pruebas de contenido/rutas/búsqueda; la validación Chromium se ejecuta localmente.
 
 ## Añadir una consulta
 

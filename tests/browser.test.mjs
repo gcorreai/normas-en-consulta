@@ -43,7 +43,7 @@ test('Chromium: filtro real, contador, sin resultados y restablecimiento bajo su
     const base=process.env.NORMAS_BASE_URL || `http://127.0.0.1:${server.address().port}/normas/`;
     const navigate=async(path)=>{await call('Page.navigate',{url:base+path});for(let i=0;i<100;i++){if(await evaluate(`document.readyState==='complete' && location.href===${JSON.stringify(base+path)}`))return;await new Promise(r=>setTimeout(r,50));}throw Error('navigation timeout');};
     await navigate('index.html');
-    for(const [query,count] of [['CMF',1],['identificacion',1],['lavado activos',1],['pensiones',0],['cmf pensiones',0],['',1]]){
+    for(const [query,count] of [['CMF',2],['identificacion',1],['lavado activos',1],['Circular 2.378',1],['riesgo mercado',1],['APRM',1],['Capítulo 21-7',1],['metodo duracion',1],['derivados',1],['cmf derivados',1],['pensiones',0],['cmf pensiones',0],['',2]]){
       const state=await evaluate(`(()=>{const input=document.querySelector('#search');input.value=${JSON.stringify(query)};input.dispatchEvent(new Event('input',{bubbles:true}));return {count:document.querySelectorAll('.entry:not([hidden])').length,empty:document.querySelector('#empty').hidden,status:document.querySelector('#results').textContent};})()`);
       assert.equal(state.count,count,query); assert.equal(state.empty,count!==0,query); assert.match(state.status,new RegExp(String(count)),query);
     }
@@ -52,17 +52,21 @@ test('Chromium: filtro real, contador, sin resultados y restablecimiento bajo su
     // Layout checks run after the filtering assertions, at mobile and desktop widths.
     for(const width of [360,390,1280]){
       await call('Emulation.setDeviceMetricsOverride',{width,height:900,deviceScaleFactor:1,mobile:width<600});
-      for(const page of ['index.html','consultas/2026-10-cmf-depositantes/index.html','consultas/2026-10-cmf-depositantes/resumen.html','plantillas/comparacion.html']){
+      for(const page of ['index.html','consultas/2026-10-cmf-depositantes/index.html','consultas/2026-10-cmf-depositantes/resumen.html','plantillas/comparacion.html','consultas/2026-07-cmf-riesgo-mercado/index.html','consultas/2026-07-cmf-riesgo-mercado/resumen.html','comparaciones/2026-07-cmf-riesgo-mercado.html']){
         await navigate(page);
         assert.equal(await evaluate('document.documentElement.scrollWidth <= innerWidth'),true,`${page} overflow at ${width}`);
         assert.ok(await evaluate('Boolean(document.querySelector("h1"))'),`${page} h1`);
+        if(width===390){
+          const broken = await evaluate(`(async()=>{const broken=[];for(const el of document.querySelectorAll('a[href],link[href],script[src]')){const url=new URL(el.href||el.src,location.href);if(url.origin!==location.origin)continue;try{const res=await fetch(url);if(!res.ok)throw Error('HTTP '+res.status);if(url.hash){const doc=new DOMParser().parseFromString(await res.text(),'text/html');if(!doc.getElementById(decodeURIComponent(url.hash.slice(1))))throw Error('missing anchor');}}catch(e){broken.push(url.href+': '+e.message);}}return broken;})()`);
+          assert.deepEqual(broken,[],`${page}: enlaces, recursos y anclas servidos`);
+        }
       }
     }
     await navigate('consultas/2026-10-cmf-depositantes/resumen.html');
     assert.equal(await evaluate(`(()=>{document.querySelectorAll('button')[0].click();return [...document.querySelectorAll('details')].every(d=>d.open)})()`),true);
     assert.equal(await evaluate(`(()=>{document.querySelectorAll('button')[1].click();return [...document.querySelectorAll('details')].every(d=>!d.open)})()`),true);
     assert.deepEqual(errors,[]);
-    console.log('12 comprobaciones de layout + controles originales: OK');
+    console.log('21 comprobaciones de layout + enlaces/recursos/anclas HTTP + controles originales: OK');
   } finally {
     if(ws)ws.close(); browser.kill(); await new Promise(r=>browser.exitCode!==null?r():browser.once('exit',r));
     await new Promise(r=>server.close(r)); await rm(profile,{recursive:true,force:true,maxRetries:5,retryDelay:200});
