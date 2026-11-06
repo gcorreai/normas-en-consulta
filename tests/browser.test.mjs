@@ -40,7 +40,7 @@ test('Chromium: filtro real, contador, sin resultados y restablecimiento bajo su
     const call=(m,p)=>send(m,p,sessionId);
     await call('Runtime.enable'); await call('Page.enable');
     const evaluate=async(expression)=>{const r=await call('Runtime.evaluate',{expression,returnByValue:true,awaitPromise:true});if(r.exceptionDetails)throw Error(JSON.stringify(r.exceptionDetails));return r.result.value;};
-    const base=`http://127.0.0.1:${server.address().port}/normas/`;
+    const base=process.env.NORMAS_BASE_URL || `http://127.0.0.1:${server.address().port}/normas/`;
     const navigate=async(path)=>{await call('Page.navigate',{url:base+path});for(let i=0;i<100;i++){if(await evaluate(`document.readyState==='complete' && location.href===${JSON.stringify(base+path)}`))return;await new Promise(r=>setTimeout(r,50));}throw Error('navigation timeout');};
     await navigate('index.html');
     for(const [query,count] of [['CMF',1],['identificacion',1],['lavado activos',1],['pensiones',0],['cmf pensiones',0],['',1]]){

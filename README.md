@@ -4,6 +4,8 @@ Sitio estático en español, sin dependencias de producción, analytics, scrapin
 
 Repositorio público: https://github.com/gcorreai/normas-en-consulta
 
+Sitio publicado y verificado: https://gcorreai.github.io/normas-en-consulta/
+
 Publicación nativa de Pages desde la rama `gh-pages`. GitHub Actions queda como ejemplo opcional, sin ejecutarse: la sesión actual no tiene permiso `workflow`. Consultar `VERIFICACION.md` para el estado y la evidencia del despliegue.
 
 ## Alcance y privacidad
@@ -33,6 +35,8 @@ Desde la raíz, con Node 24 o posterior y `chromium` en PATH:
 
 ```sh
 node --test tests/*.test.mjs
+# Repetir Chromium contra la publicación real cuando el build esté completo:
+NORMAS_BASE_URL=https://gcorreai.github.io/normas-en-consulta/ node --test tests/browser.test.mjs
 python3 -m http.server 8000 --directory site
 ```
 
