@@ -8,7 +8,7 @@ const comparison = 'site/comparaciones/2026-07-cmf-riesgo-mercado.html';
 test('superficie publicada no incorpora adjuntos, rutas privadas ni marcadores de comentarios de participantes', () => {
   const files = readdirSync('site', {recursive:true, withFileTypes:true}).filter(f => f.isFile());
   for (const file of files) assert.match(file.name, /\.(html|css|js)$/, file.name);
-  for (const file of [folder + 'index.html', folder + 'resumen.html', comparison]) {
+  for (const file of files.map(f => `${f.parentPath}/${f.name}`)) {
     const html = readFileSync(file, 'utf8');
     for (const pattern of [/\/home\//i, /\.hermes\//i, /(?:ghp_|github_pat_)/i,
       /comentario\s*(?:n[.º°]*\s*)?\d+\s*:/i, /respuesta\s*(?:de la cmf|al comentario)\s*:/i,
@@ -37,8 +37,8 @@ test('evolución muestra tres etapas y procedencia separada por materia sin elev
 test('historial incorpora riesgo de mercado buscable y enlaza sus dos lecturas con conteo correcto', async () => {
   const html = readFileSync('site/index.html', 'utf8');
   const entries = [...html.matchAll(/<article class="entry"[^>]*>[\s\S]*?<\/article>/g)].map(m => m[0]);
-  assert.equal(entries.length, 2, 'dos consultas en historial');
-  assert.match(html, /id="results"[^>]*>2 consultas en el historial/);
+  assert.equal(entries.length, 3, 'tres consultas en historial');
+  assert.match(html, /id="results"[^>]*>3 consultas en el historial/);
   assert.ok(html.indexOf('2026-10') < html.indexOf('2026-07'), 'orden histórico descendente');
   const entry = entries.find(s => s.includes('2026-07-cmf-riesgo-mercado'));
   assert.ok(entry, 'tarjeta de nueva consulta');

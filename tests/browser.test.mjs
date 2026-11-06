@@ -43,7 +43,7 @@ test('Chromium: filtro real, contador, sin resultados y restablecimiento bajo su
     const base=process.env.NORMAS_BASE_URL || `http://127.0.0.1:${server.address().port}/normas/`;
     const navigate=async(path)=>{await call('Page.navigate',{url:base+path});for(let i=0;i<100;i++){if(await evaluate(`document.readyState==='complete' && location.href===${JSON.stringify(base+path)}`))return;await new Promise(r=>setTimeout(r,50));}throw Error('navigation timeout');};
     await navigate('index.html');
-    for(const [query,count] of [['CMF',2],['identificacion',1],['lavado activos',1],['Circular 2.378',1],['riesgo mercado',1],['APRM',1],['Capítulo 21-7',1],['metodo duracion',1],['derivados',1],['cmf derivados',1],['pensiones',0],['cmf pensiones',0],['',2]]){
+    for(const [query,count] of [['CMF',3],['metodologias internas',1],['APRC',1],['riesgo credito',1],['provisiones',1],['Capítulo 21-9',1],['cmf metodologias',1],['identificacion',1],['lavado activos',1],['Circular 2.378',1],['riesgo mercado',2],['APRM',1],['Capítulo 21-7',1],['metodo duracion',1],['derivados',1],['cmf derivados',1],['pensiones',0],['cmf pensiones',0],['',3]]){
       const state=await evaluate(`(()=>{const input=document.querySelector('#search');input.value=${JSON.stringify(query)};input.dispatchEvent(new Event('input',{bubbles:true}));return {count:document.querySelectorAll('.entry:not([hidden])').length,empty:document.querySelector('#empty').hidden,status:document.querySelector('#results').textContent};})()`);
       assert.equal(state.count,count,query); assert.equal(state.empty,count!==0,query); assert.match(state.status,new RegExp(String(count)),query);
     }
@@ -52,7 +52,7 @@ test('Chromium: filtro real, contador, sin resultados y restablecimiento bajo su
     // Layout checks run after the filtering assertions, at mobile and desktop widths.
     for(const width of [360,390,1280]){
       await call('Emulation.setDeviceMetricsOverride',{width,height:900,deviceScaleFactor:1,mobile:width<600});
-      for(const page of ['index.html','consultas/2026-10-cmf-depositantes/index.html','consultas/2026-10-cmf-depositantes/resumen.html','plantillas/comparacion.html','consultas/2026-07-cmf-riesgo-mercado/index.html','consultas/2026-07-cmf-riesgo-mercado/resumen.html','comparaciones/2026-07-cmf-riesgo-mercado.html']){
+      for(const page of ['index.html','consultas/2026-10-cmf-depositantes/index.html','consultas/2026-10-cmf-depositantes/resumen.html','plantillas/comparacion.html','consultas/2026-07-cmf-riesgo-mercado/index.html','consultas/2026-07-cmf-riesgo-mercado/resumen.html','comparaciones/2026-07-cmf-riesgo-mercado.html','consultas/2026-08-cmf-metodologias-internas/index.html','consultas/2026-08-cmf-metodologias-internas/resumen.html']){
         await navigate(page);
         assert.equal(await evaluate('document.documentElement.scrollWidth <= innerWidth'),true,`${page} overflow at ${width}`);
         assert.ok(await evaluate('Boolean(document.querySelector("h1"))'),`${page} h1`);
@@ -66,7 +66,7 @@ test('Chromium: filtro real, contador, sin resultados y restablecimiento bajo su
     assert.equal(await evaluate(`(()=>{document.querySelectorAll('button')[0].click();return [...document.querySelectorAll('details')].every(d=>d.open)})()`),true);
     assert.equal(await evaluate(`(()=>{document.querySelectorAll('button')[1].click();return [...document.querySelectorAll('details')].every(d=>!d.open)})()`),true);
     assert.deepEqual(errors,[]);
-    console.log('21 comprobaciones de layout + enlaces/recursos/anclas HTTP + controles originales: OK');
+    console.log('27 comprobaciones de layout + enlaces/recursos/anclas HTTP + controles originales: OK');
   } finally {
     if(ws)ws.close(); browser.kill(); await new Promise(r=>browser.exitCode!==null?r():browser.once('exit',r));
     await new Promise(r=>server.close(r)); await rm(profile,{recursive:true,force:true,maxRetries:5,retryDelay:200});
