@@ -1,5 +1,7 @@
 # Verificación de publicación
 
+> El bloque inicial conserva la evidencia histórica de la primera publicación. El estado actual, con la Circular CMF N.º 2.378, se documenta en [Actualización: riesgo de mercado](#actualizacion-riesgo-de-mercado).
+
 ## Estado: publicado y verificado
 
 - Repositorio público: https://github.com/gcorreai/normas-en-consulta
@@ -48,3 +50,42 @@ El push de `gh-pages` habilitó Pages automáticamente. POST posterior devolvió
 El build interno de Pages no ejecuta las pruebas personalizadas. Deben ejecutarse localmente antes de cada actualización siguiendo README; no se afirma CI de tests remota. Solo el subtree `site/` se sirve en Pages; fuentes, pruebas y documentación están en `main`.
 
 La URL oficial y el informe CMF completo no se recibieron en este encargo: la ficha declara ese vacío; el resumen permanece intacto y no sustituye evidencia oficial ni constituye asesoría legal. La comparación definitiva depende de que se aporten las dos versiones públicas, nunca comentarios privados.
+
+<a id="actualizacion-riesgo-de-mercado"></a>
+## Actualización: riesgo de mercado — Circular CMF N.º 2.378
+
+### Publicación actual verificada
+
+- Commit de implementación en `main`: `17390945202bd6a5b789538750178bf8ee9b2abd`.
+- Subtree publicado en `gh-pages`: `3e246b2365e2a6c6db7956bf380d6df82c999678`; ambos SHA comprobados mediante `git ls-remote` después del push normal, sin forzar ni reescribir historia.
+- Build Pages leído por API: `built`, sin mensaje de error, commit exacto del subtree.
+- Despliegue interno: https://github.com/gcorreai/normas-en-consulta/actions/runs/42237761084 — `completed` / `success`, mismo `head_sha`.
+- Configuración leída sin modificar: `legacy`, `gh-pages`, `/`, HTTPS obligatorio; sin cambios a Settings, Actions, OAuth ni credenciales.
+- Solo nueve archivos HTML/CSS/JS del subtree se sirven en Pages. No se publicaron PDF, herramientas locales ni archivos temporales.
+
+### Páginas y contenido añadidos
+
+- Ficha: https://gcorreai.github.io/normas-en-consulta/consultas/2026-07-cmf-riesgo-mercado/index.html
+- Resumen: https://gcorreai.github.io/normas-en-consulta/consultas/2026-07-cmf-riesgo-mercado/resumen.html
+- Evolución: https://gcorreai.github.io/normas-en-consulta/comparaciones/2026-07-cmf-riesgo-mercado.html
+- Portada con dos entradas, búsqueda y enlaces relativos a ficha/resumen/evolución.
+- Comparación temática de inicial → nueva propuesta → Circular: ajuste vertical, compensación, acceso a duración, requisitos/cálculo, R07/MSI, transitorios, estimaciones y otros ajustes. Referencias separadas a propuesta y Circular, por sección/numeral y página física.
+
+### Pruebas ejecutadas para esta incorporación
+
+- Baseline previo: `node --test tests/*.test.mjs`, 6/6 aprobadas.
+- RED→GREEN observado para ficha/resumen inexistentes; evolución inexistente; y portada/búsqueda todavía con una sola consulta. No se cambió el algoritmo de búsqueda ni los estilos compartidos.
+- Suite final local: `node --test tests/*.test.mjs`, **10 aprobadas, 0 fallidas**.
+- Rutas locales: **7 páginas y 45 enlaces/recursos/anclas** válidos dentro del sitio.
+- Chromium local bajo `/normas/` y público bajo `/normas-en-consulta/`: **21 comprobaciones responsive por ejecución**, en 360/390/1280 px. A 390 px se solicitaron por HTTP los enlaces, recursos y anclas de las siete páginas: sin roturas. Filtro por título, CMF y temas, contador, cero resultados, restablecimiento y controles originales: aprobados, sin excepciones JavaScript.
+- Navegador público: `NORMAS_BASE_URL=https://gcorreai.github.io/normas-en-consulta/ node --test tests/browser.test.mjs`, **1 aprobada, 0 fallidas**.
+- `python3 .runtime/verify_public.py`: **9 archivos más raíz con HTTP 200**, sin redirecciones y con SHA-256 idéntico a los archivos locales; raíz idéntica a portada.
+- `node --check` sobre buscador y pruebas modificadas: salida 0. `git diff --cached --check`: salida 0.
+- `git diff --exit-code f257c6b -- site/consultas/2026-10-cmf-depositantes`: salida 0. Ficha de depositantes intacta, SHA-256 `c5e712b33191aba723bc6b7d856b26bb2896264987e6edb1ffa2f663923bf2ba`; resumen conserva `95c45455d5a1fa9cb5a638545b052546fbb8f5f42a532463d6e3aa5da2d881a0`.
+- Diff revisado y guardas de privacidad ejecutadas: sin rutas privadas, secretos ni reproducción concreta de comentarios. Las guardas por patrones son complementarias a la selección y revisión del contenido, no una prueba semántica exhaustiva.
+
+### Límites actuales
+
+El contenido se elaboró a partir del informe comparativo validado recibido para esta incorporación; no se recotejaron los PDF directamente en esta ejecución. Los títulos, referencias físicas y límites de ese handoff se preservan. No se recibió URL oficial pública ni fechas de inicio/cierre de segunda consulta: no se inventaron. Se distingue emisión de publicación y vigencia, y se conservan las diferencias documentales de comunicación/aprobación y registro 11 sin resolverlas jurídicamente. Las estimaciones no se presentan como mandatos; las fórmulas o tablas de extracción dudosa no se reconstruyen. No se incluyeron comentarios privados ni contenido concreto de comentarios de la industria.
+
+No hubo revisión independiente en esta ejecución headless: se aplicó revisión propia del diff y pruebas reproducibles. `gh` sigue sin estar instalado; se reutilizó el cliente REST local y el helper Git existente sin mostrar secretos. El primer intento de commit falló por identidad Git ausente; se usó únicamente en la invocación de commit la identidad pública ya presente en la historia de este repositorio, sin cambiar configuración global. El build interno de Pages no ejecuta las pruebas personalizadas: estas se ejecutaron localmente antes de publicar.
